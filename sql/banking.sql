@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `banking` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */;
+CREATE DATABASE  IF NOT EXISTS `banking` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci */;
 USE `banking`;
 -- MySQL dump 10.13  Distrib 8.0.13, for Win64 (x86_64)
 --
@@ -23,7 +23,7 @@ USE `banking`;
 
 DROP TABLE IF EXISTS `contact`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `contact` (
   `id` varchar(45) NOT NULL,
   `customerId` varchar(45) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `contact` (
   `toNickName` varchar(45) NOT NULL,
   `createdAt` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,7 +50,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `history` (
   `id` varchar(45) NOT NULL,
   `payAccId` varchar(45) NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE `history` (
   `message` varchar(45) NOT NULL,
   `createdAt` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +81,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `payacc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `payacc` (
   `id` varchar(10) NOT NULL,
   `customerId` varchar(45) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE `payacc` (
   `status` varchar(45) NOT NULL,
   `createdAt` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,7 +102,7 @@ CREATE TABLE `payacc` (
 
 LOCK TABLES `payacc` WRITE;
 /*!40000 ALTER TABLE `payacc` DISABLE KEYS */;
-INSERT INTO `payacc` VALUES ('-Qh5Vpqew','RS9vvnjvYR','taulakha1ch@gmail.com','customer3','06983544','85020173','0','OPEN','2018-12-31 09:45'),('-wvMpkUZE','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','44654942','0','OPEN','2019-01-02 12:38'),('avVPUBuDR','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','87240963','0','CLOSED','2018-12-30 15:36'),('g-glCUcHA','oOyRmS5bjC','taulakhach@gmail.com','customer2','06983544','98592933','41341','OPEN','2019-01-02 10:14'),('HpkAfQDxN','RS9vvnjvYR','taulakha1ch@gmail.com','customer3','06983544','83383813','41341','OPEN','2018-12-31 01:25'),('I7tJtF8pH','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','16294995','0','OPEN','2019-01-02 12:36'),('LHeouDxxR','RS9vvnjvYR','taulakha1ch@gmail.com','customer3','06983544','26834461','0','OPEN','2018-12-31 01:24'),('LhSB6X-xW','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','47046880','0','OPEN','2019-01-02 12:37'),('Sn7zMmVFP','oOyRmS5bjC','taulakhach@gmail.com','customer2','06983544','91538945','123','OPEN','2018-12-31 01:24');
+INSERT INTO `payacc` VALUES ('-Qh5Vpqew','RS9vvnjvYR','clone001st@gmail.com','customer3','06983544','85020173','0','OPEN','2018-12-31 09:45'),('-wvMpkUZE','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','44654942','0','OPEN','2019-01-02 12:38'),('avVPUBuDR','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','87240963','0','CLOSED','2018-12-30 15:36'),('g-glCUcHA','oOyRmS5bjC','taulakhach@gmail.com','customer2','06983544','98592933','41341','OPEN','2019-01-02 10:14'),('HpkAfQDxN','RS9vvnjvYR','clone001st@gmail.com','customer3','06983544','83383813','41341','OPEN','2018-12-31 01:25'),('I7tJtF8pH','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','16294995','0','OPEN','2019-01-02 12:36'),('LHeouDxxR','RS9vvnjvYR','clone001st@gmail.com','customer3','06983544','26834461','0','OPEN','2018-12-31 01:24'),('LhSB6X-xW','8yZfAOq1pm','songvancam@gmail.com','khach1','06983544','47046880','0','OPEN','2019-01-02 12:37'),('Sn7zMmVFP','oOyRmS5bjC','taulakhach@gmail.com','customer2','06983544','91538945','123','OPEN','2018-12-31 01:24');
 /*!40000 ALTER TABLE `payacc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,13 +112,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `userreftokenext`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `userreftokenext` (
   `f_userId` varchar(10) NOT NULL,
   `f_refToken` varchar(80) NOT NULL,
   `f_rdt` varchar(19) NOT NULL,
   PRIMARY KEY (`f_userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +137,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `users` (
   `f_id` varchar(10) NOT NULL,
   `f_username` varchar(45) NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE `users` (
   `f_createdAt` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `f_email_UNIQUE` (`f_email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,7 +158,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('7kxwDSxCrD','staff','202cb962ac59075b964b07152d234b70','taulanhanvienm@gmail.com','nhanvien','06983544',2,'2018-12-30 16:34'),('oOyRmS5bjC','customer2','202cb962ac59075b964b07152d234b70','taulakhach@gmail.com','khachhangquen','06983544',1,'2018-12-30 16:37'),('RS9vvnjvYR','customer3','202cb962ac59075b964b07152d234b70','taulakha1ch@gmail.com','khachhangquen1','06983544',1,'2018-12-30 16:38'),('wdqrEyohs7','client','202cb962ac59075b964b07152d234b70','songvancam@gmail.com','khach','06983544',1,'2018-12-30 16:32');
+INSERT INTO `users` VALUES ('7kxwDSxCrD','staff','202cb962ac59075b964b07152d234b70','taulanhanvienm@gmail.com','Nhan vien','06983544',2,'2018-12-30 16:34'),('oOyRmS5bjC','customer2','202cb962ac59075b964b07152d234b70','taulakhach@gmail.com','khachhangquen','06983544',1,'2018-12-30 16:37'),('RS9vvnjvYR','customer3','202cb962ac59075b964b07152d234b70','clone001st@gmail.com','Khach hang','06983544',1,'2018-12-30 16:38'),('wdqrEyohs7','client','202cb962ac59075b964b07152d234b70','songvancam@gmail.com','khach','06983544',1,'2018-12-30 16:32');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
