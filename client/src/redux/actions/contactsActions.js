@@ -49,7 +49,7 @@ export const handleCreateContact = (
   reload
 ) => dispatch => {
   if (toNickName.trim() === "")
-    return axios
+    axios
       .get(`http://localhost:3001/pay-acc/${toAccNumber}`, {
         headers: {
           "x-access-token": getCookie("access_token")
@@ -133,7 +133,7 @@ export const handleCreateContact = (
         console.log(err);
       });
   else
-    return axios
+    axios
       .post(
         "http://localhost:3001/contact",
         {
