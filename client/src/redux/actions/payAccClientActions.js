@@ -1,9 +1,11 @@
 import axios from "axios";
 import { getCookie } from "tiny-cookie";
+import { getUserInfo } from "../../utils/authHelper";
 import * as payAccClientConstants from "../constants/payAccClientConstants";
 import * as messageConstants from "../constants/messageConstants";
 
 export const getPayAccsList = customerId => dispatch => {
+  const customerId = getUserInfo("f_id");
   if (!customerId)
     return {
       type: messageConstants.OPEN_MESSAGE,
@@ -86,7 +88,14 @@ export const handleClosePayAcc = (
   currentBalance,
   receiverPayAccNumber
 ) => dispatch => {
-  if (!payAccId || !accNumber || isNaN(currentBalance) || !receiverPayAccNumber)
+  const accessToken = getCookie("access_token");
+  if (
+    !payAccId ||
+    !accNumber ||
+    isNaN(currentBalance) ||
+    !receiverPayAccNumber ||
+    !accessToken
+  )
     return {
       type: messageConstants.OPEN_MESSAGE,
       payload: {
@@ -101,7 +110,7 @@ export const handleClosePayAcc = (
     axios
       .get(`http://localhost:3001/pay-acc/${receiverPayAccNumber}`, {
         headers: {
-          "x-access-token": getCookie("access_token")
+          "x-access-token": accessToken
         }
       })
       .then(resp => {
@@ -122,7 +131,7 @@ export const handleClosePayAcc = (
                 },
                 {
                   headers: {
-                    "x-access-token": getCookie("access_token")
+                    "x-access-token": accessToken
                   }
                 }
               ),
@@ -134,7 +143,7 @@ export const handleClosePayAcc = (
                 },
                 {
                   headers: {
-                    "x-access-token": getCookie("access_token")
+                    "x-access-token": accessToken
                   }
                 }
               ),
@@ -151,7 +160,7 @@ export const handleClosePayAcc = (
                 },
                 {
                   headers: {
-                    "x-access-token": getCookie("access_token")
+                    "x-access-token": accessToken
                   }
                 }
               ),
@@ -168,7 +177,7 @@ export const handleClosePayAcc = (
                 },
                 {
                   headers: {
-                    "x-access-token": getCookie("access_token")
+                    "x-access-token": accessToken
                   }
                 }
               )
@@ -226,7 +235,7 @@ export const handleClosePayAcc = (
       },
       {
         headers: {
-          "x-access-token": getCookie("access_token")
+          "x-access-token": accessToken
         }
       }
     )
@@ -259,7 +268,8 @@ export const closeClosePayAccDialog = () => ({
 });
 
 export const handleViewHistory = (payAccId, accNumber) => dispatch => {
-  if (!payAccId || !accNumber)
+  const accessToken = getCookie("access_token");
+  if (!payAccId || !accNumber || !accessToken)
     return dispatch({
       type: messageConstants.OPEN_MESSAGE,
       payload: {
@@ -271,7 +281,7 @@ export const handleViewHistory = (payAccId, accNumber) => dispatch => {
   axios
     .get(`http://localhost:3001/histories/${payAccId}`, {
       headers: {
-        "x-access-token": getCookie("access_token")
+        "x-access-token": accessToken
       }
     })
     .then(resp => {

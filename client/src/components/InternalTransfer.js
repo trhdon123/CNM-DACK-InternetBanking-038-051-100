@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import axios from "axios";
-import { getCookie } from "tiny-cookie";
+import { connect } from "react-redux";
 import {
   Button,
   Checkbox,
@@ -28,445 +27,28 @@ import {
 } from "@material-ui/core";
 import Message from "./Message";
 import MustBeCustomer from "./HOCs/MustBeCustomer";
-import { getUserInfo } from "../utils/authHelper";
+import * as internalTransferActions from "../redux/actions/internalTransferActions";
 
 class InternalTransfer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      payAccs: [],
-      payAccsTransferable: [],
-      payAccId: "",
-      currentBalance: 0,
-      // for notify message
-      isMessageOpen: false,
-      messageType: "",
-      message: "",
-      receiverPayAccId: "",
-      receiverPayAccNumber:
-        (props.location.state && props.location.state.receiverPayAccNumber) ||
-        "",
-      receiverName: "",
-      receiverEmail: "",
-      receiverPhone: "",
-      receiverCurrentBalance: 0,
-      transferAmount: "",
-      transferMsg: "",
-      feeType: "1",
-      isDialogOTPOpen: false,
-      OTP: "",
-      checkOTP: null,
-      isInContacts: true,
-      saveContact: true
-    };
-  }
-
-  getPayAccsList = () => {
-    const customerId = getUserInfo("f_id");
-
-    if (customerId === null)
-      return this.setState({
-        messageType: "error",
-        isMessageOpen: true,
-        message: "Sorry, could not get your entity, please sign in again"
-      });
-
-    axios
-      .get(`http://localhost:3001/pay-accs/${customerId}`, {
-        headers: {
-          "x-access-token": getCookie("access_token")
-        }
-      })
-      .then(resp => {
-        const { status, data } = resp;
-        if (status === 200) {
-          // only accounts with balance > 0
-          const payAccs = data,
-            payAccsTransferable = data.filter(payAcc => +payAcc.balance > 0);
-          if (payAccs.length > 0)
-            // default selected payment account
-            this.setState({
-              payAccs,
-              payAccsTransferable
-            });
-        } else {
-          this.setState({
-            messageType: "error",
-            isMessageOpen: true,
-            message: "Sorry, failed getting your payment accounts list"
-          });
-          throw new Error(
-            "Something went wrong when getting payment accounts list, status ",
-            status
-          );
-        }
-      })
-      .catch(err => {
-        this.setState({
-          messageType: "error",
-          isMessageOpen: true,
-          message: "Sorry, failed getting your payment accounts list"
-        });
-        console.log(err);
-      });
-  };
-
   componentDidMount = () => {
-    this.getPayAccsList();
+    this.props.getPayAccsList();
   };
 
-  handleInputChange = e => {
-    const { name, value } = e.target;
-    if (name === "payAccId")
-      return this.setState({
-        [name]: value,
-        accNumber: this.state.payAccs.find(payAcc => payAcc.id === value)
-          .accNumber,
-        currentBalance: +this.state.payAccs.find(payAcc => payAcc.id === value)
-          .balance
-      });
-
-    this.setState({ [name]: value });
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps.reload !== this.props.reload) {
+      this.props.getPayAccsList();
+    }
   };
 
-  handleCloseMessage = () => {
-    this.setState({ isMessageOpen: false, message: "" });
-  };
-
-  handleCloseOTPDialog = () => {
-    this.setState({
-      isDialogOTPOpen: false,
-      checkOTP: null,
-      OTP: "",
-      receiverPayAccId: "",
-      receiverName: "",
-      receiverEmail: "",
-      receiverPhone: "",
-      receiverCurrentBalance: 0,
-      saveContact: true,
-      isInContacts: true
-    });
-  };
-
-  handleOpenOTPDialog = () => {
-    const clientName = getUserInfo("f_name"),
-      clientEmail = getUserInfo("f_email");
-
-    const {
-      receiverPayAccNumber,
-      feeType,
-      currentBalance,
-      transferAmount
-    } = this.state;
-    console.log(
-      getUserInfo("f_id"),
-      `http://localhost:3001/contact/${receiverPayAccNumber}/is-existed`
-    );
-    axios
-      .all([
-        axios.post(
-          "http://localhost:3001/send-otp",
-          {
-            clientEmail,
-            clientName
-          },
-          {
-            headers: {
-              "x-access-token": getCookie("access_token")
-            }
-          }
-        ),
-        axios.get(`http://localhost:3001/pay-acc/${receiverPayAccNumber}`, {
-          headers: {
-            "x-access-token": getCookie("access_token")
-          }
-        }),
-        axios.get(
-          `http://localhost:3001/contact/${receiverPayAccNumber}/is-existed?customerId=${getUserInfo(
-            "f_id"
-          )}`,
-          {
-            headers: {
-              "content-type": "application/json",
-              "x-access-token": getCookie("access_token")
-            }
-          }
-        )
-      ])
-      .then(
-        axios.spread((getOTP, getReceiver, getContactExisted) => {
-          if (getOTP.status !== 201) {
-            this.setState({
-              messageType: "error",
-              isMessageOpen: true,
-              message:
-                "Sorry, failed sending request for OTP, please try again later"
-            });
-            throw new Error(
-              "Something went wrong when requesting for OTP, status ",
-              getOTP.status
-            );
-          }
-
-          if (getReceiver.status !== 200) {
-            this.setState({
-              messageType: "error",
-              isMessageOpen: true,
-              message:
-                "Sorry, failed getting receiver details , please try again later"
-            });
-            throw new Error(
-              "Something went wrong when getting receiver details, status ",
-              getOTP.status
-            );
-          }
-
-          const {
-            data: { otp: checkOTP }
-          } = getOTP;
-
-          if (getReceiver.data.length < 1)
-            return this.setState({
-              messageType: "warning",
-              isMessageOpen: true,
-              message: `No payment account attached to ${receiverPayAccNumber}, please try another one`
-            });
-
-          const {
-            id: receiverPayAccId,
-            clientName: receiverName,
-            clientEmail: receiverEmail,
-            phone: receiverPhone,
-            balance: receiverCurrentBalance
-          } = getReceiver.data[0];
-
-          const senderFee = +feeType === 1 ? 10000 : 0,
-            receiverFee = +feeType === 2 ? 10000 : 0;
-          if (+feeType === 1 && +senderFee > +currentBalance - +transferAmount)
-            return this.setState({
-              messageType: "error",
-              isMessageOpen: true,
-              message: "Remaining balance is not enough for extra fee"
-            });
-          if (
-            +feeType === 2 &&
-            +receiverFee > +receiverCurrentBalance + +transferAmount
-          )
-            return this.setState({
-              messageType: "error",
-              isMessageOpen: true,
-              message: "Transaction failed. Contact your receiver for detail."
-            });
-
-          const isInContacts = +getContactExisted.data.existed === 1;
-          console.log(getContactExisted.data.existed);
-          this.setState({
-            checkOTP,
-            receiverPayAccId,
-            receiverName,
-            receiverEmail,
-            receiverPhone,
-            receiverPayAccNumber,
-            receiverCurrentBalance,
-            isDialogOTPOpen: true,
-            isInContacts
-          });
-        })
-      )
-      .catch(err => {
-        this.setState({
-          messageType: "error",
-          isMessageOpen: true,
-          message:
-            "Sorry, failed sending request for OTP or getting receiver details, please try again later"
-        });
-        console.log(err);
-      });
-  };
-
-  handleCheckChange = name => event => {
-    this.setState({ [name]: event.target.checked });
-  };
-
-  handleTransfer = () => {
-    // check inputs
-    const {
-      payAccId,
-      accNumber,
-      currentBalance,
-      transferAmount,
-      receiverPayAccId,
-      receiverPayAccNumber,
-      receiverName,
-      receiverCurrentBalance,
-      feeType,
-      transferMsg,
-      saveContact,
-      isInContacts
-    } = this.state;
-
-    // call API
-    const senderFee = +feeType === 1 ? 10000 : 0,
-      receiverFee = +feeType === 2 ? 10000 : 0;
-
-    const axiosArr = [
-      axios.patch(
-        "http://localhost:3001/pay-acc/balance",
-        {
-          payAccId,
-          newBalance: +currentBalance - +transferAmount - senderFee
-        },
-        {
-          headers: {
-            "x-access-token": getCookie("access_token")
-          }
-        }
-      ),
-      axios.patch(
-        "http://localhost:3001/pay-acc/balance",
-        {
-          payAccId: receiverPayAccId,
-          newBalance: +receiverCurrentBalance + +transferAmount - receiverFee
-        },
-        {
-          headers: {
-            "x-access-token": getCookie("access_token")
-          }
-        }
-      ),
-      axios.post(
-        "http://localhost:3001/history",
-        {
-          payAccId,
-          fromAccNumber: accNumber,
-          toAccNumber: receiverPayAccNumber,
-          amount: +transferAmount,
-          transactionType: "sent",
-          feeType: -+senderFee,
-          message: transferMsg
-        },
-        {
-          headers: {
-            "x-access-token": getCookie("access_token")
-          }
-        }
-      ),
-      axios.post(
-        "http://localhost:3001/history",
-        {
-          payAccId: receiverPayAccId,
-          fromAccNumber: accNumber,
-          toAccNumber: receiverPayAccNumber,
-          amount: +transferAmount,
-          transactionType: "received",
-          feeType: -+receiverFee,
-          message: transferMsg
-        },
-        {
-          headers: {
-            "x-access-token": getCookie("access_token")
-          }
-        }
-      )
-    ];
-
-    if (saveContact === true && isInContacts === false)
-      axiosArr.push(
-        axios.post(
-          "http://localhost:3001/contact",
-          {
-            customerId: getUserInfo("f_id"),
-            toAccNumber: receiverPayAccNumber,
-            toNickName: receiverName
-          },
-          {
-            headers: {
-              "x-access-token": getCookie("access_token")
-            }
-          }
-        )
-      );
-
-    axios
-      .all([...axiosArr])
-      .then(
-        axios.spread(
-          (
-            updateSenderPayAcc,
-            updateReceiverPayAcc,
-            sendHistory,
-            receiveHistory
-          ) => {
-            if (
-              updateSenderPayAcc.status !== 201 ||
-              updateReceiverPayAcc.status !== 201
-            ) {
-              this.setState({
-                messageType: "error",
-                isMessageOpen: true,
-                message: "Sorry, transaction failed"
-              });
-              throw new Error(
-                "Something went wrong operating transaction, status ",
-                updateSenderPayAcc.status
-              );
-            }
-
-            if (sendHistory.status !== 201 || receiveHistory.status !== 201) {
-              this.setState({
-                messageType: "error",
-                isMessageOpen: true,
-                message: "Sorry, failed updating history of the transaction"
-              });
-              throw new Error(
-                "Something went wrong when updating history of the transaction, status ",
-                updateSenderPayAcc.status
-              );
-            }
-
-            if (
-              updateSenderPayAcc.status === 201 &&
-              updateReceiverPayAcc.status === 201 &&
-              sendHistory.status === 201 &&
-              receiveHistory.status === 201
-            )
-              this.setState(
-                {
-                  isDialogOTPOpen: false,
-                  messageType: "success",
-                  isMessageOpen: true,
-                  message: "Successfully operated the transaction",
-                  // reset form
-                  receiverPayAccNumber: "",
-                  transferAmount: "",
-                  transferMsg: "",
-                  OTP: "",
-                  checkOTP: "",
-                  currentBalance:
-                    +currentBalance -
-                    +transferAmount -
-                    (+feeType === 1 ? 10000 : 0),
-                  saveContact: true,
-                  isInContacts: true
-                }, // refresh payment accounts
-                this.setState({ feeType: "1" }, this.getPayAccsList)
-              );
-          }
-        )
-      )
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  checkValidInputs = () => {
+  checkInvalidInputs = () => {
     const {
       payAccs,
       currentBalance,
       receiverPayAccNumber,
       transferAmount,
-      transferMsg
-    } = this.state;
+      transferMsg,
+      feeType
+    } = this.props;
 
     if (receiverPayAccNumber === "") return true;
 
@@ -485,32 +67,42 @@ class InternalTransfer extends Component {
     )
       return true;
 
+    const senderFee = +feeType === 1 ? 10000 : 0;
+    if (+feeType === 1 && +senderFee >= +currentBalance - +transferAmount)
+      return true;
+
     return false;
   };
 
   render() {
     const {
-      payAccs,
-      payAccsTransferable,
-      payAccId,
-      accNumber,
-      currentBalance,
-      transferAmount,
-      transferMsg,
-      receiverName,
-      receiverEmail,
-      receiverPhone,
-      receiverPayAccNumber,
-      isMessageOpen,
-      messageType,
-      message,
-      feeType,
-      isDialogOTPOpen,
-      OTP,
-      checkOTP,
-      saveContact,
-      isInContacts
-    } = this.state;
+        payAccs,
+        payAccsTransferable,
+        payAccId,
+        accNumber,
+        currentBalance,
+        transferAmount,
+        transferMsg,
+        receiverPayAccId,
+        receiverCurrentBalance,
+        receiverName,
+        receiverEmail,
+        receiverPhone,
+        isMessageOpen,
+        messageType,
+        message,
+        feeType,
+        isDialogOTPOpen,
+        OTP,
+        checkOTP,
+        saveContact,
+        isInContacts,
+        reload
+      } = this.props,
+      receiverPayAccNumber =
+        (this.props.location.state &&
+          this.props.location.state.receiverPayAccNumber) ||
+        this.props.receiverPayAccNumber;
 
     return (
       <React.Fragment>
@@ -548,7 +140,7 @@ class InternalTransfer extends Component {
 
                     <Select
                       value={payAccId}
-                      onChange={this.handleInputChange}
+                      onChange={e => this.props.handleInputChange(e, payAccs)}
                       inputProps={{
                         name: "payAccId",
                         id: "payAccId"
@@ -564,7 +156,7 @@ class InternalTransfer extends Component {
                     <FormHelperText>
                       Current balance: {currentBalance}
                     </FormHelperText>
-                    {payAccId !== "" && currentBalance < 10000 && (
+                    {payAccId !== "" && currentBalance <= 10000 && (
                       <FormHelperText style={{ color: "red" }}>
                         Current balance is not enough for the extra fee
                       </FormHelperText>
@@ -575,10 +167,10 @@ class InternalTransfer extends Component {
                     label="Account number of receiver *"
                     fullWidth
                     margin="normal"
-                    onChange={this.handleInputChange}
+                    onChange={this.props.handleInputChange}
                     name="receiverPayAccNumber"
                     value={receiverPayAccNumber}
-                    disabled={currentBalance < 10000}
+                    disabled={currentBalance <= 10000}
                   />
                   {payAccs
                     .map(payAcc => payAcc.accNumber)
@@ -594,51 +186,61 @@ class InternalTransfer extends Component {
                     type="number"
                     fullWidth
                     margin="normal"
-                    onChange={this.handleInputChange}
+                    onChange={this.props.handleInputChange}
                     name="transferAmount"
                     value={transferAmount}
-                    disabled={currentBalance < 10000}
+                    disabled={currentBalance <= 10000}
                   />
-                  {+transferAmount > +currentBalance && (
+                  {transferAmount > currentBalance && (
                     <FormHelperText style={{ color: "red" }}>
                       Amount of the transaction must not be greater than current
                       balance
                     </FormHelperText>
                   )}
+                  {payAccId &&
+                    +feeType === 1 &&
+                    ((10000 > +currentBalance - +transferAmount &&
+                      currentBalance >= transferAmount) ||
+                      currentBalance - transferAmount < 10000) && (
+                      <FormHelperText style={{ color: "red" }}>
+                        You may choose Receiver fee type as remaining balance
+                        would not be enough for extra fee
+                      </FormHelperText>
+                    )}
                   <TextField
                     id="transferMsg"
                     label="Message *"
                     fullWidth
                     margin="normal"
-                    onChange={this.handleInputChange}
+                    onChange={this.props.handleInputChange}
                     name="transferMsg"
                     value={transferMsg}
-                    disabled={currentBalance < 10000}
+                    disabled={currentBalance <= 10000}
                   />
                 </div>
                 <div>
                   <div style={{ textAlign: "left" }}>
                     <FormControl component="div">
                       <FormLabel component="legend">
-                        Fee payment type (-10.000)
+                        Fee payment type (10.000)
                       </FormLabel>
                       <RadioGroup
                         aria-label="Fee payment type (-10.000)"
                         name="feeType"
                         value={feeType}
-                        onChange={this.handleInputChange}
+                        onChange={this.props.handleInputChange}
                       >
                         <FormControlLabel
                           value="1"
                           control={<Radio />}
                           label="Sender"
-                          disabled={currentBalance < 10000}
+                          disabled={currentBalance <= 10000}
                         />
                         <FormControlLabel
                           value="2"
                           control={<Radio />}
                           label="Receiver"
-                          disabled={currentBalance < 10000}
+                          disabled={currentBalance <= 10000}
                         />
                       </RadioGroup>
                     </FormControl>
@@ -648,8 +250,15 @@ class InternalTransfer extends Component {
                       variant="contained"
                       color="primary"
                       fullWidth
-                      onClick={this.handleOpenOTPDialog}
-                      disabled={this.checkValidInputs()}
+                      onClick={() =>
+                        this.props.openOTPDialog(
+                          receiverPayAccNumber,
+                          feeType,
+                          +currentBalance,
+                          +transferAmount
+                        )
+                      }
+                      disabled={this.checkInvalidInputs()}
                     >
                       Transfer
                     </Button>
@@ -663,7 +272,7 @@ class InternalTransfer extends Component {
         {/* dialog to confirm and input OTP */}
         <Dialog
           open={isDialogOTPOpen}
-          onClose={this.handleCloseOTPDialog}
+          onClose={this.props.closeOTPDialog}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -732,7 +341,9 @@ class InternalTransfer extends Component {
                   control={
                     <Checkbox
                       checked={saveContact}
-                      onChange={this.handleCheckChange("saveContact")}
+                      onChange={e =>
+                        this.props.handleInputChange(e, [], "saveContact")
+                      }
                       value="true"
                     />
                   }
@@ -746,7 +357,7 @@ class InternalTransfer extends Component {
                 label="OTP *"
                 fullWidth
                 margin="normal"
-                onChange={this.handleInputChange}
+                onChange={this.props.handleInputChange}
                 name="OTP"
                 value={OTP}
                 autoFocus
@@ -762,11 +373,27 @@ class InternalTransfer extends Component {
             </div>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleCloseOTPDialog} color="secondary">
+            <Button onClick={this.props.closeOTPDialog} color="secondary">
               cancel
             </Button>
             <Button
-              onClick={this.handleTransfer}
+              onClick={() =>
+                this.props.handleTransfer(
+                  payAccId,
+                  accNumber,
+                  currentBalance,
+                  transferAmount,
+                  receiverPayAccId,
+                  receiverPayAccNumber,
+                  receiverName,
+                  receiverCurrentBalance,
+                  feeType,
+                  transferMsg,
+                  saveContact,
+                  isInContacts,
+                  reload
+                )
+              }
               color="primary"
               autoFocus
               disabled={OTP.length !== 6 || OTP !== checkOTP}
@@ -780,11 +407,72 @@ class InternalTransfer extends Component {
           variant={messageType}
           message={message}
           open={isMessageOpen}
-          onClose={this.handleCloseMessage}
+          onClose={this.props.closeMessage}
         />
       </React.Fragment>
     );
   }
 }
 
-export default MustBeCustomer(InternalTransfer);
+const mapStateToProps = state => ({ ...state.internalTransfer });
+
+const mapDispatchToProps = dispatch => ({
+  getPayAccsList: () => dispatch(internalTransferActions.getPayAccsList()),
+  openOTPDialog: (
+    receiverPayAccNumber,
+    feeType,
+    currentBalance,
+    transferAmount
+  ) =>
+    dispatch(
+      internalTransferActions.openOTPDialog(
+        receiverPayAccNumber,
+        feeType,
+        currentBalance,
+        transferAmount
+      )
+    ),
+  closeOTPDialog: () => dispatch(internalTransferActions.closeOTPDialog()),
+  handleTransfer: (
+    payAccId,
+    accNumber,
+    currentBalance,
+    transferAmount,
+    receiverPayAccId,
+    receiverPayAccNumber,
+    receiverName,
+    receiverCurrentBalance,
+    feeType,
+    transferMsg,
+    saveContact,
+    isInContacts,
+    reload
+  ) =>
+    dispatch(
+      internalTransferActions.handleTransfer(
+        payAccId,
+        accNumber,
+        currentBalance,
+        transferAmount,
+        receiverPayAccId,
+        receiverPayAccNumber,
+        receiverName,
+        receiverCurrentBalance,
+        feeType,
+        transferMsg,
+        saveContact,
+        isInContacts,
+        reload
+      )
+    ),
+  handleInputChange: (e, payAccs, _name) =>
+    dispatch(internalTransferActions.handleInputChange(e, payAccs, _name)),
+  closeMessage: () => dispatch(internalTransferActions.closeMessage())
+});
+
+export default MustBeCustomer(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(InternalTransfer)
+);

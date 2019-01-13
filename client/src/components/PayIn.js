@@ -36,9 +36,9 @@ export default class PayIn extends Component {
     const { payAccId, currentBalance, accNumber } = this.props;
 
     if (
-      payAccId === null ||
-      currentBalance === null ||
-      payInAmount === null ||
+      !payAccId ||
+      isNaN(currentBalance) ||
+      isNaN(payInAmount) ||
       isNaN(currentBalance) ||
       isNaN(payInAmount) ||
       payInAmount < 0

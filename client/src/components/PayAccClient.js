@@ -12,21 +12,18 @@ import {
 } from "@material-ui/core";
 import MUIDataTable from "mui-datatables";
 import Message from "./Message";
-import { getUserInfo } from "../utils/authHelper";
 import MustBeCustomer from "./HOCs/MustBeCustomer";
 import * as payAccClientActions from "../redux/actions/payAccClientActions";
 import * as messageActions from "../redux/actions/messageActions";
 
 class PayAccClient extends Component {
   componentDidMount = () => {
-    const customerId = getUserInfo("f_id");
-    this.props.getPayAccsList(customerId);
+    this.props.getPayAccsList();
   };
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.reload !== this.props.reload) {
-      const customerId = getUserInfo("f_id");
-      this.props.getPayAccsList(customerId);
+      this.props.getPayAccsList();
     }
   };
 
@@ -296,8 +293,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getPayAccsList: customerId =>
-    dispatch(payAccClientActions.getPayAccsList(customerId)),
+  getPayAccsList: () => dispatch(payAccClientActions.getPayAccsList()),
   openClosePayAccDialog: (payAccId, accNumber, currentBalance, payAccs) =>
     dispatch(
       payAccClientActions.openClosePayAccDialog(
