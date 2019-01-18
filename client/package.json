@@ -10,6 +10,7 @@
     "mui-datatables": "^2.0.0-beta-44",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-media": "^1.9.2",
     "react-recaptcha": "^2.3.10",
     "react-redux": "^6.0.0",
     "react-router": "^4.3.1",

@@ -1,4 +1,5 @@
 import React from "react";
+import Media from "react-media";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
@@ -112,7 +113,7 @@ const styles = theme => ({
 
 class Dashboard extends React.Component {
   state = {
-    open: true
+    open: false
   };
 
   handleDrawerOpen = () => {
@@ -124,6 +125,7 @@ class Dashboard extends React.Component {
   };
 
   render() {
+    const { open } = this.state;
     const { classes, screen, title } = this.props;
     const userType = getUserInfo("f_type");
 
@@ -132,22 +134,16 @@ class Dashboard extends React.Component {
         <CssBaseline />
         <AppBar
           position="absolute"
-          className={classNames(
-            classes.appBar,
-            this.state.open && classes.appBarShift
-          )}
+          className={classNames(classes.appBar, open && classes.appBarShift)}
         >
-          <Toolbar
-            disableGutters={!this.state.open}
-            className={classes.toolbar}
-          >
+          <Toolbar disableGutters={!open} className={classes.toolbar}>
             <IconButton
               color="inherit"
               aria-label="Open drawer"
               onClick={this.handleDrawerOpen}
               className={classNames(
                 classes.menuButton,
-                this.state.open && classes.menuButtonHidden
+                open && classes.menuButtonHidden
               )}
             >
               <MenuIcon />
@@ -164,32 +160,46 @@ class Dashboard extends React.Component {
             <LetterAvatar className="userAvatar" />
           </Toolbar>
         </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classNames(
-              classes.drawerPaper,
-              !this.state.open && classes.drawerPaperClose
-            )
-          }}
-          open={this.state.open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={this.handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            {userType === 2 ? mainListItemsStaff : mainListItemsClient}
-          </List>
-          <Divider />
-          <List>
-            {userType === 2
-              ? secondaryListItemsStaff
-              : secondaryListItemsClient}
-          </List>
-        </Drawer>
+
+        <Media query="(max-width: 960px)">
+          {match => (
+            <Drawer
+              variant={match ? "temporary" : "permanent"}
+              classes={{
+                paper: classNames(
+                  classes.drawerPaper,
+                  !open && classes.drawerPaperClose
+                )
+              }}
+              open={open}
+              anchor="left"
+              onClose={this.handleDrawerClose}
+            >
+              <div className={classes.toolbarIcon}>
+                <IconButton onClick={this.handleDrawerClose}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </div>
+              <Divider />
+              <List>
+                {userType === 2 ? mainListItemsStaff : mainListItemsClient}
+              </List>
+              <Divider />
+              <List
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: open ? "100%" : "auto"
+                }}
+              >
+                {userType === 2
+                  ? secondaryListItemsStaff
+                  : secondaryListItemsClient}
+              </List>
+            </Drawer>
+          )}
+        </Media>
+
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           {screen}

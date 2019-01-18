@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import Media from "react-media";
 import {
   Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle
+  DialogTitle,
+  FormControlLabel,
+  Icon,
+  Radio,
+  RadioGroup
 } from "@material-ui/core";
 import MUIDataTable from "mui-datatables";
 import Message from "./Message";
@@ -54,34 +56,44 @@ class PayAccClient extends Component {
             <span style={{ color: status === "OPEN" ? "#008b00" : "#e54304" }}>
               {status}
             </span>,
-            <div>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => this.props.handleViewHistory(id, accNumber)}
-              >
-                history
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() =>
-                  this.props.openClosePayAccDialog(
-                    id,
-                    accNumber,
-                    balance,
-                    payAccs
-                  )
-                }
-                style={{ marginLeft: "10px" }}
-                disabled={
-                  status === "CLOSED" ||
-                  payAccs.filter(payAcc => payAcc.status === "OPEN").length < 2
-                }
-              >
-                close
-              </Button>
-            </div>
+            <Media query="(min-width: 1050px)">
+              {match => (
+                <div>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    onClick={() => this.props.handleViewHistory(id, accNumber)}
+                  >
+                    <Icon>history</Icon>
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="secondary"
+                    onClick={() =>
+                      this.props.openClosePayAccDialog(
+                        id,
+                        accNumber,
+                        balance,
+                        payAccs
+                      )
+                    }
+                    style={{
+                      marginLeft: match ? "5px" : 0,
+                      marginTop: match ? "0" : "5px"
+                    }}
+                    disabled={
+                      status === "CLOSED" ||
+                      payAccs.filter(payAcc => payAcc.status === "OPEN")
+                        .length < 2
+                    }
+                  >
+                    <Icon>delete</Icon>
+                  </Button>
+                </div>
+              )}
+            </Media>
           ];
         }),
         columns: ["#", "Number", "Balance", "Created at", "Status", "Action"],
@@ -229,10 +241,15 @@ class PayAccClient extends Component {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.props.closeClosePayAccDialog} color="primary">
+            <Button
+              size="small"
+              onClick={this.props.closeClosePayAccDialog}
+              color="primary"
+            >
               Cancel
             </Button>
             <Button
+              size="small"
               onClick={() =>
                 this.props.handleClosePayAcc(
                   payAccId,
@@ -268,6 +285,7 @@ class PayAccClient extends Component {
           </DialogContent>
           <DialogActions>
             <Button
+              size="small"
               onClick={this.props.closeViewHistoryDialog}
               color="primary"
               autoFocus

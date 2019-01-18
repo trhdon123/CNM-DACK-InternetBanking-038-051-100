@@ -6,7 +6,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Icon
 } from "@material-ui/core";
 import MUIDataTable from "mui-datatables";
 import Message from "./Message";
@@ -42,6 +43,7 @@ class Customers extends Component {
       customer.phone,
       customer.createdAt,
       <Button
+        size="small"
         variant="contained"
         color="primary"
         onClick={() =>
@@ -53,7 +55,7 @@ class Customers extends Component {
           )
         }
       >
-        create payment account
+        <Icon>add</Icon> &nbsp;payment account
       </Button>
     ]);
 
@@ -98,12 +100,14 @@ class Customers extends Component {
           </DialogContent>
           <DialogActions>
             <Button
+              size="small"
               onClick={this.props.closeCreatePayAccConfirmDialog}
               color="primary"
             >
               cancel
             </Button>
             <Button
+              size="small"
               onClick={() =>
                 this.props.handleCreatePayAcc(
                   customerId,
@@ -141,6 +145,7 @@ class Customers extends Component {
           </DialogContent>
           <DialogActions>
             <Button
+              size="small"
               onClick={this.props.closeCreatePayAccOperatedDialog}
               color="primary"
               autoFocus

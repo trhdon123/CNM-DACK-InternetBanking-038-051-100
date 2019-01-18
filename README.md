@@ -4,12 +4,12 @@
 
 - Final term project for subject **_New Technology in Software development_** (HCMUS)
 - This is a fork from the [original](https://github.com/vancam038/CNM-DACK-InternetBanking-038-051-100) to complete what haven't done in time to meet my taste (mostly in front-end)
-- Using NodeJs/ExpressJS for back-end; ReactJS/Redux for front-end; MySQL for database
+- Use `NodeJs/ExpressJS` for back-end; `ReactJS/Redux` for front-end; `MySQL` for database
 - Thank you [@vancam038](https://github.com/vancam038) for the journey as well as your great contribution
 
 ## Todo
 
-- [ ] fully integrate redux and refactor code for PayAccClient and InternalTransfer pages
+- [x] fully implement redux and refactor code for PayAccClient and InternalTransfer pages
 - [ ] better responsive (for mobile devices?)
 - [ ] add auto-completion for searching customer's contacts
 - [ ] use `webpack`
@@ -18,6 +18,7 @@
 
 ```
 project
+└── api_collection_postman
 └── server // back-end
 └── client // front-end
 └── sql // database
@@ -31,24 +32,18 @@ project
 - server
 
   - change credentials for database connection in file `./server/src/fn/mysql-db.js`
-  - change credentials to send OTP code in fle `./server/nodemailer.js`
-  - then run the following in `server` root folder
-    ```
-    npm install
-    ```
+  - change credentials to send OTP code in file `./server/nodemailer.js`
+  - run `npm install` from `./server`
 
 - client
-  - simply run the following in `client` root folder
-    ```
-    npm install
-    ```
+  - run `npm install` from `./client`
 
 ### Database
 
 - Use any MySQL database management tool to execute SQL file `./sql/banking.sql`
   - change records email in both `users` and `payacc` tables in order to receive OTP code to your email
 
-## Buid and run
+## Build and run
 
-- run `npm start` in `server` root folder to start back-end server listening to `localhost:3000`
-- run `npm start` in `client` root folder to start front-end server listening to `localhost:3001`
+- run `npm start` from `./server` for back-end server listening to `localhost:3000`
+- run `npm start` from `./client` for front-end server listening to `localhost:3001`

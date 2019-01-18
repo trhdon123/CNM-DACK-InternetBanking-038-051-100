@@ -46,7 +46,7 @@ class Contacts extends Component {
         toAccNumber,
         toNickName,
         createdAt,
-        <Button variant="contained" color="primary">
+        <Button size="small" variant="contained" color="primary">
           <Link
             to={{
               pathname: "/internal-transfers",
