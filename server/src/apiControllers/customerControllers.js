@@ -9,7 +9,6 @@ router.get("/customers", (req, res) => {
     .getCustomers()
     .then(rows => {
       res.statusCode = 200;
-      // res.json(rows);
       res.send(
         _.sortBy(JSON.parse(JSON.stringify(rows)), [
           function(o) {

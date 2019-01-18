@@ -10,7 +10,6 @@ router.post("/user", (req, res) => {
   authRepo
     .add(req.body, id)
     .then(value => {
-      console.log(value);
       res.statusCode = 201;
       res.json(req.body);
     })
@@ -69,8 +68,6 @@ router.post("/token", (req, res) => {
     authRepo
       .getNewAccessToken(refToken)
       .then(value => {
-        console.log("then -> ");
-        console.log(value);
         res.json({
           access_token: value
         });

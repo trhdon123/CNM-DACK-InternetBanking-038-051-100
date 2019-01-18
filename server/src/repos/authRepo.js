@@ -23,8 +23,6 @@ exports.generateAccessToken = userEntity => {
 
 exports.verifyAccessToken = (req, res, next) => {
   var token = req.headers["x-access-token"];
-  console.log(token);
-
   if (token) {
     jwt.verify(token, SECRET, (err, payload) => {
       if (err) {
@@ -39,7 +37,6 @@ exports.verifyAccessToken = (req, res, next) => {
           });
         }
       } else {
-        console.log(payload);
         req.token_payload = payload;
         next();
       }
@@ -76,15 +73,11 @@ exports.getNewAccessToken = rfToken => {
     var sql = `select f_userId from userreftokenext where f_refToken = '${rfToken}'`;
     db.load(sql)
       .then(rows => {
-        console.log("userID ->");
         if (rows.length !== 0) {
           let userId = rows[0].f_userId;
-          console.log(userId);
           let sql_user = `select * from users where f_id = '${userId}'`;
           db.load(sql_user)
             .then(rows_user => {
-              console.log(`user at id = '${userId}'`);
-              console.log(rows_user);
               if (rows_user.length !== 0) {
                 let userEntity = rows_user[0];
                 let access_token = this.generateAccessToken(userEntity);
@@ -124,7 +117,6 @@ exports.add = (userEntity, id) => {
   //     Phone: 01231412313
   //     Type: 0
   // }
-  // var id = uid(10);
   var md5_pwd = md5(userEntity.Password);
   var sql = `insert into users(f_id, f_password, f_username, f_email, f_name , f_phone, f_type, f_createdAt) values('${id}','${md5_pwd}', '${
     userEntity.Username

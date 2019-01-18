@@ -16,7 +16,7 @@ router.get("/pay-accs", (req, res) => {
       // res.json(rows);
       res.send(
         _.sortBy(JSON.parse(JSON.stringify(rows)), [
-          function (o) {
+          function(o) {
             return o.createdAt;
           }
         ]).reverse()
@@ -39,7 +39,7 @@ router.get("/pay-accs/:customerId", (req, res) => {
       // res.json(rows);
       res.send(
         _.sortBy(JSON.parse(JSON.stringify(rows)), [
-          function (o) {
+          function(o) {
             return o.createdAt;
           }
         ]).reverse()
@@ -51,7 +51,6 @@ router.get("/pay-accs/:customerId", (req, res) => {
       res.end("View error log on console");
     });
 });
-
 
 router.post("/pay-acc", (req, res) => {
   const _payAcc = req.body;
@@ -92,12 +91,11 @@ router.patch("/pay-acc/balance", (req, res) => {
   const payAccEntity = {
     payAccId,
     newBalance
-  }
+  };
 
   payAccRepo
     .UpdateBalanceById(payAccEntity)
     .then(result => {
-      console.log(result);
       res.statusCode = 201;
       res.json({
         status: "OK"
@@ -109,7 +107,6 @@ router.patch("/pay-acc/balance", (req, res) => {
       res.end("View error log on console");
     });
 });
-
 
 router.get("/pay-acc/:accNumber", (req, res) => {
   const { accNumber } = req.params;
@@ -131,9 +128,8 @@ router.get("/pay-accs/status/open", (req, res) => {
     .loadByOpen(PAY_ACC_STATUS_OPEN)
     .then(rows => {
       res.statusCode = 200;
-      // console.log(rows.length);
       res.json({
-        "number_of_open": rows.length,
+        number_of_open: rows.length,
         rows
       });
     })
@@ -147,18 +143,17 @@ router.get("/pay-accs/status/open", (req, res) => {
 router.patch("/pay-acc/status/closed", (req, res) => {
   const payAccId = req.body.payAccId;
   const newStatus = PAY_ACC_STATUS_CLOSED;
-  const newBalance = '0';
+  const newBalance = "0";
 
   const payAccEntity = {
     payAccId,
     newStatus,
     newBalance
-  }
+  };
 
   payAccRepo
     .UpdateStatusById(payAccEntity)
     .then(result => {
-      console.log(result);
       res.statusCode = 201;
       res.json({
         status: "OK"
