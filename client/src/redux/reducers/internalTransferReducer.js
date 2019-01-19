@@ -1,4 +1,5 @@
 import * as internalTransferConstants from "../constants/internalTransferConstants";
+import { GET_CONTACTS_LIST_SUCCEED } from "../constants/contactsConstants";
 import * as messageConstants from "../constants/messageConstants";
 
 const initState = {
@@ -26,6 +27,7 @@ const initState = {
   checkOTP: null,
   OTP: "",
   // option to save contact if not existed
+  contacts: [],
   isInContacts: true,
   // disable auto-save for contact by default in case API check failed
   saveContact: true,
@@ -36,6 +38,12 @@ const internalTransferReducer = (state = initState, action) => {
   switch (action.type) {
     case internalTransferConstants.GET_PAY_ACCS_LIST_SUCCEED:
       return { ...state, ...action.payload };
+    case GET_CONTACTS_LIST_SUCCEED:
+      const contacts = action.payload.map(contact => ({
+        label: contact.toNickName,
+        value: contact.toAccNumber
+      }));
+      return { ...state, contacts };
     case internalTransferConstants.OPEN_OTP_DIALOG:
       return { ...state, ...action.payload, isDialogOTPOpen: true };
     case internalTransferConstants.CLOSE_OTP_DIALOG:

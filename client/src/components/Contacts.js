@@ -11,20 +11,17 @@ import {
 import MUIDataTable from "mui-datatables";
 import Message from "./Message";
 import MustBeCustomer from "./HOCs/MustBeCustomer";
-import { getUserInfo } from "../utils/authHelper";
 import * as contactsActions from "../redux/actions/contactsActions";
 import * as messageActions from "../redux/actions/messageActions";
 
 class Contacts extends Component {
   componentDidMount = () => {
-    const customerId = getUserInfo("f_id");
-    this.props.getContactsList(customerId);
+    this.props.getContactsList();
   };
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.reload !== this.props.reload) {
-      const customerId = getUserInfo("f_id");
-      this.props.getContactsList(customerId);
+      this.props.getContactsList();
     }
   };
 
@@ -122,7 +119,6 @@ class Contacts extends Component {
                   fullWidth
                   onClick={() =>
                     this.props.handleCreateContact(
-                      getUserInfo("f_id"),
                       toAccNumber,
                       toNickName,
                       reload
@@ -165,16 +161,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getContactsList: customerId =>
-    dispatch(contactsActions.getContactsList(customerId)),
-  handleCreateContact: (customerId, toAccNumber, toNickName, reload) =>
+  getContactsList: () => dispatch(contactsActions.getContactsList()),
+  handleCreateContact: (toAccNumber, toNickName, reload) =>
     dispatch(
-      contactsActions.handleCreateContact(
-        customerId,
-        toAccNumber,
-        toNickName,
-        reload
-      )
+      contactsActions.handleCreateContact(toAccNumber, toNickName, reload)
     ),
   handleInputChange: e => dispatch(contactsActions.handleInputChange(e)),
   closeMessage: () => dispatch(messageActions.closeMessage())

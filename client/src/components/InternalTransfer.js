@@ -25,18 +25,22 @@ import {
   TextField,
   Typography
 } from "@material-ui/core";
+import AutoSuggest from "./AutoSuggest";
 import Message from "./Message";
 import MustBeCustomer from "./HOCs/MustBeCustomer";
 import * as internalTransferActions from "../redux/actions/internalTransferActions";
+import { getContactsList } from "../redux/actions/contactsActions";
 
 class InternalTransfer extends Component {
   componentDidMount = () => {
     this.props.getPayAccsList();
+    this.props.getContactsList();
   };
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.reload !== this.props.reload) {
       this.props.getPayAccsList();
+      this.props.getContactsList();
     }
   };
 
@@ -95,6 +99,7 @@ class InternalTransfer extends Component {
         isDialogOTPOpen,
         OTP,
         checkOTP,
+        contacts,
         saveContact,
         isInContacts,
         reload
@@ -162,14 +167,11 @@ class InternalTransfer extends Component {
                       </FormHelperText>
                     )}
                   </FormControl>
-                  <TextField
-                    id="receiverPayAccNumber"
-                    label="Account number of receiver *"
-                    fullWidth
-                    margin="normal"
-                    onChange={this.props.handleInputChange}
+                  <AutoSuggest
+                    defaultValue={receiverPayAccNumber}
                     name="receiverPayAccNumber"
-                    value={receiverPayAccNumber}
+                    suggestions={contacts}
+                    onChange={this.props.handleInputChange}
                     disabled={currentBalance <= 10000}
                   />
                   {payAccs
@@ -418,6 +420,7 @@ const mapStateToProps = state => ({ ...state.internalTransfer });
 
 const mapDispatchToProps = dispatch => ({
   getPayAccsList: () => dispatch(internalTransferActions.getPayAccsList()),
+  getContactsList: () => dispatch(getContactsList()),
   openOTPDialog: (
     receiverPayAccNumber,
     feeType,

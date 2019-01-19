@@ -10,8 +10,8 @@
 ## Todo
 
 - [x] fully implement redux and refactor code for PayAccClient and InternalTransfer pages
-- [ ] better responsive (for mobile devices?)
-- [ ] add auto-completion for searching customer's contacts
+- [x] better responsive (for mobile devices?)
+- [x] add auto-completion for searching customer's contacts
 - [ ] use `webpack`
 
 ## Project structure
@@ -47,3 +47,10 @@ project
 
 - run `npm start` from `./server` for back-end server listening to `localhost:3000`
 - run `npm start` from `./client` for front-end server listening to `localhost:3001`
+
+## Demo account credentials (username - password)
+
+- staff - 123
+- customer2 - 123
+- customer3 - 123
+- client - 123

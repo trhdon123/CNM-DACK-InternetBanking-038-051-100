@@ -1,13 +1,23 @@
 import axios from "axios";
 import { getCookie } from "tiny-cookie";
+import { getUserInfo } from "../../utils/authHelper";
 import * as contactsConstants from "../constants/contactsConstants";
 import * as messageConstants from "../constants/messageConstants";
 
-export const getContactsList = customerId => dispatch =>
+export const getContactsList = customerId => dispatch => {
+  const customerId = getUserInfo("f_id"),
+    accessToken = getCookie("access_token");
+  if (!customerId || !accessToken) {
+    return {
+      messageType: "error",
+      message: "Sorry, failed getting contacts list"
+    };
+  }
+
   axios
     .get(`http://localhost:3001/contacts/${customerId}`, {
       headers: {
-        "x-access-token": getCookie("access_token")
+        "x-access-token": accessToken
       }
     })
     .then(resp => {
@@ -41,18 +51,26 @@ export const getContactsList = customerId => dispatch =>
       });
       console.log(err);
     });
+};
 
 export const handleCreateContact = (
-  customerId,
   toAccNumber,
   toNickName,
   reload
 ) => dispatch => {
+  const customerId = getUserInfo("f_id"),
+    accessToken = getCookie("access_token");
+  if (!customerId || !accessToken) {
+    return {
+      messageType: "error",
+      message: "Sorry, failed creating new contact"
+    };
+  }
   if (toNickName.trim() === "")
     axios
       .get(`http://localhost:3001/pay-acc/${toAccNumber}`, {
         headers: {
-          "x-access-token": getCookie("access_token")
+          "x-access-token": accessToken
         }
       })
       .then(resp => {
@@ -68,7 +86,7 @@ export const handleCreateContact = (
               },
               {
                 headers: {
-                  "x-access-token": getCookie("access_token")
+                  "x-access-token": accessToken
                 }
               }
             )
@@ -143,7 +161,7 @@ export const handleCreateContact = (
         },
         {
           headers: {
-            "x-access-token": getCookie("access_token")
+            "x-access-token": accessToken
           }
         }
       )
