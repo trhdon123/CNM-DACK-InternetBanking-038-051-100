@@ -2,17 +2,10 @@
 
 ## Getting started
 
-- Final term project for subject **_New Technology in Software development_** (HCMUS)
+- Final term project for subject **_New Technology in Software development_** [(HCMUS)](https://www.hcmus.edu.vn/)
 - This is a fork from the [original](https://github.com/vancam038/CNM-DACK-InternetBanking-038-051-100) to complete what haven't done in time to meet my taste (mostly in front-end)
 - Use `NodeJs/ExpressJS` for back-end; `ReactJS/Redux` for front-end; `MySQL` for database
 - Thank you [@vancam038](https://github.com/vancam038) for the journey as well as your great contribution
-
-## Todo
-
-- [x] fully implement redux and refactor code for PayAccClient and InternalTransfer pages
-- [x] better responsive (for mobile devices?)
-- [x] add auto-completion for searching customer's contacts
-- [ ] use `webpack`
 
 ## Project structure
 
@@ -48,9 +41,10 @@ project
 - run `npm start` from `./server` for back-end server listening to `localhost:3000`
 - run `npm start` from `./client` for front-end server listening to `localhost:3001`
 
-## Demo account credentials (username - password)
+### Demo account credentials 
 
-- staff - 123
-- customer2 - 123
-- customer3 - 123
-- client - 123
+(username - password)
+
+- `staff` - `123` for staff functionalities
+- `client`, `customer2`, `customer3` - `123` for customer functionalities
+
